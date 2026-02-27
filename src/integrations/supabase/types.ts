@@ -14,16 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      registrations: {
+        Row: {
+          category: Database["public"]["Enums"]["participant_category"]
+          college: string
+          college_id_url: string | null
+          confirmation_sent: boolean
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          payment_screenshot_url: string | null
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          phone: string
+          track_interest: Database["public"]["Enums"]["workshop_track"]
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["participant_category"]
+          college: string
+          college_id_url?: string | null
+          confirmation_sent?: boolean
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          payment_screenshot_url?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          phone: string
+          track_interest: Database["public"]["Enums"]["workshop_track"]
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["participant_category"]
+          college?: string
+          college_id_url?: string | null
+          confirmation_sent?: boolean
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          payment_screenshot_url?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          phone?: string
+          track_interest?: Database["public"]["Enums"]["workshop_track"]
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      registration_stats: {
+        Row: {
+          pending: number | null
+          rejected: number | null
+          total: number | null
+          verified: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "coordinator"
+      participant_category:
+        | "UG_STUDENT"
+        | "PG_STUDENT"
+        | "RESEARCH_SCHOLAR"
+        | "FACULTY"
+        | "PROFESSIONAL"
+      payment_status: "PENDING" | "VERIFIED" | "REJECTED"
+      workshop_track:
+        | "QUANTUM_SECURITY"
+        | "POST_QUANTUM"
+        | "CRYPTOGRAPHY"
+        | "AI_CYBERSECURITY"
+        | "DARK_WEB"
+        | "BLOCKCHAIN"
+        | "MOBILE_FORENSICS"
+        | "UAV_FORENSICS"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +245,26 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "coordinator"],
+      participant_category: [
+        "UG_STUDENT",
+        "PG_STUDENT",
+        "RESEARCH_SCHOLAR",
+        "FACULTY",
+        "PROFESSIONAL",
+      ],
+      payment_status: ["PENDING", "VERIFIED", "REJECTED"],
+      workshop_track: [
+        "QUANTUM_SECURITY",
+        "POST_QUANTUM",
+        "CRYPTOGRAPHY",
+        "AI_CYBERSECURITY",
+        "DARK_WEB",
+        "BLOCKCHAIN",
+        "MOBILE_FORENSICS",
+        "UAV_FORENSICS",
+      ],
+    },
   },
 } as const
