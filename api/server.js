@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
-const db = require('./db');
+const db = require('./Db');
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
