@@ -1,14 +1,8 @@
-require('dotenv').config();
-const mysql = require('mysql2/promise');
+const { createClient } = require('@supabase/supabase-js');
 
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    port: 3306,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 2,
-});
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SECRET_KEY
+);
 
-module.exports = pool;
+module.exports = supabase;

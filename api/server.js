@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
-const db = require('./Db');
+const supabase = require('./Db');
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -10,90 +10,102 @@ app.use(express.json());
 
 // GET all registrations
 app.get('/registrations', async (req, res) => {
-  try {
-    const [rows] = await db.query(
-      'SELECT first_name, last_name, email, phone, college, category FROM registration'
-    );
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  const { data, error } = await supabase
+    .from('registration')
+    .select('*');
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
 });
 
 // GET single registration by email
 app.get('/registrations/:email', async (req, res) => {
-  try {
-    const [rows] = await db.query(
-      'SELECT first_name, last_name, email, phone, college, category FROM registration WHERE email = ?',
-      [req.params.email]
-    );
-    if (rows.length === 0) return res.status(404).json({ error: 'Registration not found' });
-    res.json(rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  const { data, error } = await supabase
+    .from('registration')
+    .select('*')
+    .eq('email', req.params.email)
+    .single();
+  if (error) return res.status(404).json({ error: 'Not found' });
+  res.json(data);
 });
 
-// POST create a new registration
+// POST create registration
 app.post('/registrations', upload.single('id_proof'), async (req, res) => {
   const { first_name, last_name, email, phone, college, category } = req.body;
-  const id_proof = req.file ? req.file.buffer : null;
 
   if (!first_name || !last_name || !email || !phone || !college || !category) {
     return res.status(400).json({ error: 'All fields are required' });
   }
 
-  try {
-    await db.query(
-      'INSERT INTO registration (first_name, last_name, email, phone, college, category, id_proof) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [first_name, last_name, email, parseInt(phone), college, category, id_proof]
-    );
-    res.status(201).json({ message: 'Registration created successfully' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  let id_proof_url = null;
+
+  // Image upload to Supabase Storage
+  if (req.file) {
+    const fileName = `${Date.now()}_${req.file.originalname}`;
+    const { error: uploadError } = await supabase.storage
+      .from('id-proofs')
+      .upload(fileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+      });
+
+    if (uploadError) return res.status(500).json({ error: uploadError.message });
+
+    const { data: urlData } = supabase.storage
+      .from('id-proofs')
+      .getPublicUrl(fileName);
+
+    id_proof_url = urlData.publicUrl;
   }
+
+  const { error } = await supabase
+    .from('registration')
+    .insert([{ first_name, last_name, email, phone: parseInt(phone), college, category, id_proof_url }]);
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.status(201).json({ message: 'Registration created successfully' });
 });
 
-// PUT update a registration
+// PUT update registration
 app.put('/registrations/:email', upload.single('id_proof'), async (req, res) => {
   const { first_name, last_name, phone, college, category } = req.body;
-  const id_proof = req.file ? req.file.buffer : null;
+  const updates = {};
 
-  const fields = [];
-  const values = [];
+  if (first_name) updates.first_name = first_name;
+  if (last_name) updates.last_name = last_name;
+  if (phone) updates.phone = parseInt(phone);
+  if (college) updates.college = college;
+  if (category) updates.category = category;
 
-  if (first_name) { fields.push('first_name = ?'); values.push(first_name); }
-  if (last_name) { fields.push('last_name = ?'); values.push(last_name); }
-  if (phone) { fields.push('phone = ?'); values.push(parseInt(phone)); }
-  if (college) { fields.push('college = ?'); values.push(college); }
-  if (category) { fields.push('category = ?'); values.push(category); }
-  if (id_proof) { fields.push('id_proof = ?'); values.push(id_proof); }
+  if (req.file) {
+    const fileName = `${Date.now()}_${req.file.originalname}`;
+    await supabase.storage
+      .from('id-proofs')
+      .upload(fileName, req.file.buffer, { contentType: req.file.mimetype });
 
-  if (fields.length === 0) return res.status(400).json({ error: 'No fields to update' });
+    const { data: urlData } = supabase.storage
+      .from('id-proofs')
+      .getPublicUrl(fileName);
 
-  values.push(req.params.email);
-  try {
-    const [result] = await db.query(
-      `UPDATE registration SET ${fields.join(', ')} WHERE email = ?`, values
-    );
-    if (result.affectedRows === 0) return res.status(404).json({ error: 'Not found' });
-    res.json({ message: 'Updated successfully' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    updates.id_proof_url = urlData.publicUrl;
   }
+
+  const { error } = await supabase
+    .from('registration')
+    .update(updates)
+    .eq('email', req.params.email);
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ message: 'Updated successfully' });
 });
 
-// DELETE a registration
+// DELETE registration
 app.delete('/registrations/:email', async (req, res) => {
-  try {
-    const [result] = await db.query(
-      'DELETE FROM registration WHERE email = ?', [req.params.email]
-    );
-    if (result.affectedRows === 0) return res.status(404).json({ error: 'Not found' });
-    res.json({ message: 'Deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  const { error } = await supabase
+    .from('registration')
+    .delete()
+    .eq('email', req.params.email);
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ message: 'Deleted successfully' });
 });
 
 const PORT = process.env.PORT || 3000;
