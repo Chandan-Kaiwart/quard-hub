@@ -91,7 +91,7 @@ const RegistrationSection = () => {
       if (!validateCategory(category))
         throw new Error("Please select a valid category.");
       if (!validateFile(file))
-        throw new Error("Invalid file. Only JPG, PNG, or PDF under 5MB allowed.");
+        throw new Error("Invalid file. Only JPG, PNG, or PDF under 10 MB allowed.");
 
       // Step 1: Upload ID proof to Supabase Storage
       const ext = file!.name.split(".").pop();
