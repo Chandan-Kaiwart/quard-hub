@@ -79,27 +79,60 @@ const RegistrationSection = () => {
 
       if (!validateName(firstName))
         throw new Error("Please enter a valid first name (letters only).");
-
       if (!validateName(lastName))
         throw new Error("Please enter a valid last name (letters only).");
-
       if (!validateEmail(email))
         throw new Error("Please enter a valid email address.");
-
       if (!validatePhone(phone))
         throw new Error("Please enter a valid phone number.");
-
       if (!validateCollege(college))
         throw new Error("Please enter a valid college/organization name.");
-
       if (!validateCategory(category))
         throw new Error("Please select a valid category.");
-
       if (!validateFile(file))
         throw new Error("Invalid file. Only JPG, PNG, or PDF under 5MB allowed.");
 
-      // Simulate backend submission
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Step 1: Upload image to Supabase Storage directly from frontend
+      const { createClient } = await import("@supabase/supabase-js");
+      const supabase = createClient(
+        import.meta.env.SUPABASE_URL,
+        import.meta.env.SUPABASE_SECRET_KEY
+      );
+
+      let id_proof_url = null;
+
+      if (file) {
+        const fileName = `${Date.now()}_${file.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from("id-proofs")
+          .upload(fileName, file, { contentType: file.type });
+
+        if (uploadError) throw new Error("File upload failed: " + uploadError.message);
+
+        const { data: urlData } = supabase.storage
+          .from("id-proofs")
+          .getPublicUrl(fileName);
+
+        id_proof_url = urlData.publicUrl;
+      }
+
+      // Step 2: Send data to API
+      const response = await fetch("/api/registrations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          first_name: firstName,
+          last_name: lastName,
+          email,
+          phone,
+          college,
+          category,
+          id_proof_url,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Registration failed.");
 
       setStatus("success");
     } catch (error) {
