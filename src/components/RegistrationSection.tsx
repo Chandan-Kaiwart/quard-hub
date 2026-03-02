@@ -116,7 +116,7 @@ const RegistrationSection = () => {
         throw new Error("Please select a valid category.");
 
       if (!validateFile(file))
-        throw new Error("Invalid file. Only JPG, PNG, PDF under 5MB allowed.");
+        throw new Error("Invalid file. Only JPG, PNG, PDF under 4 MB allowed.");
 
       const payload = new FormData();
       payload.append("first_name", firstName);
