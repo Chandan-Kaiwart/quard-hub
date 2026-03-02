@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Send, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import {
   sanitize,
@@ -40,6 +40,22 @@ const RegistrationSection = () => {
     useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [isFull, setIsFull] = useState(false);
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const res = await fetch("/api/registration-stats");
+        const data = await res.json();
+        if (data.left === 0) {
+          setIsFull(true);
+        }
+      } catch (error) {
+        console.error("Failed to check registration status:", error);
+      }
+    };
+    checkStatus();
+  }, []);
 
   const registrationAmount =
     categories.find((c) => c.value === selectedCategory)?.amount ?? null;
@@ -173,7 +189,23 @@ const RegistrationSection = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="max-w-2xl mx-auto"
         >
-          {status === "success" ? (
+          {isFull ? (
+            <div className="gold-border rounded-xl p-12 bg-card/30 backdrop-blur-sm text-center">
+              <AlertCircle className="w-16 h-16 text-primary mx-auto mb-6" />
+              <h3 className="font-heading text-2xl font-bold mb-3">
+                Registrations Full
+              </h3>
+              <p className="text-muted-foreground whitespace-pre-line">
+                We have reached our maximum capacity for this workshop.
+                {"\n"}Thank you for your overwhelming interest!
+              </p>
+              <div className="mt-8">
+                <a href="#about" className="text-primary hover:underline font-mono text-sm">
+                  // Stay tuned for future events
+                </a>
+              </div>
+            </div>
+          ) : status === "success" ? (
             <div className="gold-border rounded-xl p-12 bg-card/30 backdrop-blur-sm text-center">
               <CheckCircle className="w-16 h-16 text-primary mx-auto mb-6" />
               <h3 className="font-heading text-2xl font-bold mb-3">

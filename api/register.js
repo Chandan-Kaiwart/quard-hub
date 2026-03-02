@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import formidable from "formidable";
 import fs from "fs";
-import { validateApiPayload } from "./validation.js";
+import { validateApiPayload, MAX_REGISTRATIONS } from "./validation.js";
 
 export const config = {
     api: {
@@ -44,6 +44,17 @@ export default async function handler(req, res) {
                 category,
                 transaction_id,
             } = fields;
+
+            // Check limit FIRST
+            const { count: currentCount, error: countError } = await supabase
+                .from("registrations")
+                .select("*", { count: "exact", head: true });
+
+            if (countError) throw countError;
+
+            if (currentCount >= MAX_REGISTRATIONS) {
+                return res.status(429).json({ error: "Registration is full." });
+            }
 
             // Simple validation on fields
             if (!first_name || !email || !transaction_id) {

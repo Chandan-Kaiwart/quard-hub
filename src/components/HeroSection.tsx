@@ -1,7 +1,24 @@
 import { motion } from "framer-motion";
 import { Shield, ChevronDown } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const HeroSection = () => {
+  const [seatsLeft, setSeatsLeft] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/registration-stats");
+        const data = await res.json();
+        if (data.left !== undefined) {
+          setSeatsLeft(data.left);
+        }
+      } catch (error) {
+        console.error("Failed to fetch registration stats:", error);
+      }
+    };
+    fetchStats();
+  }, []);
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden grid-bg">
       {/* Gradient overlay */}
@@ -101,7 +118,7 @@ const HeroSection = () => {
             { value: "8", label: "Tracks" },
             { value: "2", label: "Days" },
             { value: "9", label: "Speakers" },
-            { value: "30", label: "Seats" },
+            { value: seatsLeft !== null ? seatsLeft.toString() : "...", label: "Seats Left" },
           ].map((stat) => (
             <div key={stat.label} className="stat-card rounded-lg px-6 py-4 text-center">
               <div className="text-2xl md:text-3xl font-heading font-extrabold text-primary">

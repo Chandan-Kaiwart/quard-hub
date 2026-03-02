@@ -1,4 +1,4 @@
-const MAX_REGISTRATIONS = 30;
+export const MAX_REGISTRATIONS = 30;
 
 const VALID_CATEGORIES = [
   "UG_STUDENT/PG_Student",
