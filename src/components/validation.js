@@ -1,5 +1,3 @@
-// api/validation.js
-
 const MAX_REGISTRATIONS = 30;
 
 const VALID_CATEGORIES = [
