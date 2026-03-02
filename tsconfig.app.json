@@ -27,5 +27,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "api/register.js"]
+  "include": ["src", "api/register.js", "src/components/validation.js"]
 }

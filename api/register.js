@@ -1,11 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
 import formidable from "formidable";
 import fs from "fs";
-import { validateApiPayload, MAX_REGISTRATIONS } from "./validation.js";
+import { validateApiPayload, validateRegistrationLimit, MAX_REGISTRATIONS } from "./validation.js";
 
 export const config = {
     api: {
-        bodyParser: false,
+        bodyParser: false, // Required for formidable
     },
 };
 
@@ -25,64 +25,54 @@ export default async function handler(req, res) {
     });
 
     form.parse(req, async (err, fields, files) => {
-        console.log("--- API DEBUG START ---");
-        console.log("FIELDS:", JSON.stringify(fields, null, 2));
-        console.log("FILES:", Object.keys(files));
-
         if (err) {
             console.error("FORM PARSE ERROR:", err);
             return res.status(400).json({ error: "File parsing failed: " + err.message });
         }
 
         try {
-            const {
-                first_name,
-                last_name,
-                email,
-                phone,
-                college,
-                category,
-                transaction_id,
-            } = fields;
+            // Helper to get value from formidable fields (which might be arrays)
+            const getField = (key) => Array.isArray(fields[key]) ? fields[key][0] : fields[key];
 
-            // Check limit FIRST
-            const { count: currentCount, error: countError } = await supabase
+            const first_name = getField("first_name");
+            const last_name = getField("last_name");
+            const email = getField("email");
+            const phone = getField("phone");
+            const college = getField("college");
+            const category = getField("category");
+            const transaction_id = getField("transaction_id");
+
+            // 1. Check Registration Limit FIRST
+            const { count, error: countError } = await supabase
                 .from("registrations")
                 .select("*", { count: "exact", head: true });
 
             if (countError) throw countError;
 
-            if (currentCount >= MAX_REGISTRATIONS) {
-                return res.status(429).json({ error: "Registration is full." });
+            const limitCheck = validateRegistrationLimit(count);
+            if (!limitCheck.valid) {
+                return res.status(429).json({ error: limitCheck.error });
             }
 
-            // Simple validation on fields
+            // 2. Simple validation
             if (!first_name || !email || !transaction_id) {
-                console.error("MISSING FIELDS:", { first_name, email, transaction_id });
                 return res.status(400).json({ error: "Required fields (Name, Email, Transaction ID) missing." });
             }
 
-            // 🔥 FIX STARTS HERE
+            // 3. Handle File Upload
             const fileArray = files.college_id;
-
             if (!fileArray || !fileArray[0]) {
-                return res.status(400).json({ error: "File missing." });
+                return res.status(400).json({ error: "ID Proof file missing." });
             }
 
             const uploadedFile = fileArray[0];
-
             if (!uploadedFile.filepath) {
                 return res.status(400).json({ error: "Invalid file path." });
             }
 
             const fileBuffer = fs.readFileSync(uploadedFile.filepath);
-
-            const fileExt = uploadedFile.originalFilename
-                ?.split(".")
-                .pop();
-
-            const filePath = `registrations/${Date.now()}.${fileExt}`;
-            // 🔥 FIX ENDS HERE
+            const fileExt = uploadedFile.originalFilename?.split(".").pop() || "png";
+            const filePath = `registrations/${Date.now()}-${email.replace(/@/g, '_')}.${fileExt}`;
 
             // Upload to Supabase Storage
             const { error: uploadError } = await supabase.storage
@@ -92,7 +82,7 @@ export default async function handler(req, res) {
                 });
 
             if (uploadError) {
-                return res.status(500).json({ error: uploadError.message });
+                return res.status(500).json({ error: "Upload error: " + uploadError.message });
             }
 
             const { data: publicUrlData } = supabase.storage
@@ -101,20 +91,18 @@ export default async function handler(req, res) {
 
             const publicUrl = publicUrlData.publicUrl;
 
-            // Insert into database
+            // 4. Insert into database
             const insertPayload = {
-                first_name: Array.isArray(first_name) ? first_name[0] : first_name,
-                last_name: Array.isArray(last_name) ? last_name[0] : last_name,
-                email: Array.isArray(email) ? email[0] : email,
-                phone: Array.isArray(phone) ? phone[0] : phone,
-                college: Array.isArray(college) ? college[0] : college,
-                category: Array.isArray(category) ? category[0] : category,
+                first_name,
+                last_name,
+                email,
+                phone,
+                college,
+                category,
                 id_proof_url: publicUrl,
                 id_proof_path: filePath,
-                transaction_id: Array.isArray(transaction_id) ? transaction_id[0] : transaction_id,
+                transaction_id,
             };
-
-            console.log("INSERT PAYLOAD:", JSON.stringify(insertPayload, null, 2));
 
             const { error: dbError } = await supabase
                 .from("registrations")
@@ -122,10 +110,10 @@ export default async function handler(req, res) {
 
             if (dbError) {
                 console.error("SUPABASE DB ERROR:", dbError);
+                // Cleanup uploaded file if DB insert fails
+                await supabase.storage.from("id-proofs").remove([filePath]);
                 return res.status(500).json({ error: "Database error: " + dbError.message });
             }
-
-            console.log("--- API DEBUG SUCCESS ---");
 
             return res.status(200).json({
                 success: true,
@@ -133,6 +121,7 @@ export default async function handler(req, res) {
             });
 
         } catch (error) {
+            console.error("SERVER ERROR:", error);
             return res.status(500).json({
                 error: "Server error: " + error.message,
             });
