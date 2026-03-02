@@ -5,12 +5,12 @@ import { useRef, useState } from "react";
 import { Send, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
 const categories = [
-  { value: "UG_STUDENT/PG_Student", label: "UG Student / PG Student", amount: 500 },
-  { value: "PhD/RESEARCH_SCHOLAR", label: "PhD / Research Scholar", amount: 750 },
-  { value: "FACULTY/Academicians", label: "Faculty / Academicians", amount: 1000 },
+  { value: "UG_STUDENT/PG_Student", label: "UG Student / PG Student", amount: 1000 },
+  { value: "PhD/RESEARCH_SCHOLAR", label: "PhD / Research Scholar", amount: 1500 },
+  { value: "FACULTY/Academicians", label: "Faculty / Academicians", amount: 2000 },
 ];
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "application/pdf"];
 
 const RegistrationSection = () => {
@@ -118,7 +118,7 @@ const RegistrationSection = () => {
         throw new Error("Please select a valid category.");
 
       if (!validateFile(file))
-        throw new Error("Invalid file. Only JPG, PNG, PDF under 5MB allowed.");
+        throw new Error("Invalid file. Only JPG, PNG, PDF under 10 MB allowed.");
 
       const fileBase64 = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
@@ -247,7 +247,7 @@ const RegistrationSection = () => {
 
               <div>
                 <label className="font-mono text-xs text-muted-foreground uppercase tracking-wider block mb-2">
-                  ID Proof (College/Any Government ID in JPG/PNG/PDF, max 5MB) *
+                  ID Proof (College/Any Government ID in JPG/PNG/PDF, max 10 MB) *
                 </label>
                 <input name="college_id" type="file" required accept=".jpg,.jpeg,.png,.pdf"
                   className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border file:border-primary/30 file:text-sm file:font-mono file:bg-primary/10 file:text-primary hover:file:bg-primary/20 file:transition-colors file:cursor-pointer" />
