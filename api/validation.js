@@ -1,67 +1,80 @@
-// ─── Constants ─────────────────────────────
+// api/validation.js
 
-export const MAX_FILE_SIZE = 5 * 1024 * 1024;
-export const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "application/pdf"];
+const MAX_REGISTRATIONS = 30;
 
-export const VALID_CATEGORIES = [
+const VALID_CATEGORIES = [
   "UG_STUDENT/PG_Student",
   "PhD/RESEARCH_SCHOLAR",
   "FACULTY/Academicians",
 ];
 
-// ─── Validators ───────────────────────────
+function validateName(value) {
+  return /^[A-Za-z\s'-]{2,40}$/.test(value);
+}
 
-export const validateName = (value) =>
-  /^[A-Za-z\s'-]{2,40}$/.test(value);
+function validateEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
 
-export const validateEmail = (value) =>
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+function validatePhone(value) {
+  return /^[+]?[\d\s-]{10}$/.test(value);
+}
 
-export const validatePhone = (value) =>
-  /^[+]?[\d\s-]{10}$/.test(value);
+function validateCollege(value) {
+  return value.length >= 3 && value.length <= 120;
+}
 
-export const validateCollege = (value) =>
-  value && value.length >= 3 && value.length <= 120;
+function validateCategory(value) {
+  return VALID_CATEGORIES.includes(value);
+}
 
-export const validateCategory = (value) =>
-  VALID_CATEGORIES.includes(value);
+function sanitize(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
 
-export const validateFile = (file) =>
-  file &&
-  file.size > 0 &&
-  file.size <= MAX_FILE_SIZE &&
-  ALLOWED_FILE_TYPES.includes(file.type);
+export function validateApiPayload(fields) {
+  const {
+    first_name,
+    last_name,
+    email,
+    phone,
+    college,
+    category,
+    id_proof_url,
+  } = fields;
 
-// ─── Sanitizer ───────────────────────────
+  if (!first_name || !last_name || !email || !phone || !college || !category || !id_proof_url) {
+    return { valid: false, error: "All fields are required." };
+  }
 
-export const sanitize = (value) =>
-  typeof value === "string" ? value.trim() : "";
-
-// ─── Form Validation ─────────────────────
-
-export function validateRegistrationForm(fields) {
-  const { firstName, lastName, email, phone, college, category, file } = fields;
-
-  if (!validateName(firstName))
+  if (!validateName(sanitize(first_name)))
     return { valid: false, error: "Invalid first name." };
 
-  if (!validateName(lastName))
+  if (!validateName(sanitize(last_name)))
     return { valid: false, error: "Invalid last name." };
 
-  if (!validateEmail(email))
-    return { valid: false, error: "Invalid email." };
+  if (!validateEmail(sanitize(String(email)).toLowerCase()))
+    return { valid: false, error: "Invalid email address." };
 
-  if (!validatePhone(phone))
+  if (!validatePhone(sanitize(phone)))
     return { valid: false, error: "Invalid phone number." };
 
-  if (!validateCollege(college))
-    return { valid: false, error: "Invalid college." };
+  if (!validateCollege(sanitize(college)))
+    return { valid: false, error: "Invalid college/organization." };
 
-  if (!validateCategory(category))
+  if (!validateCategory(sanitize(category)))
     return { valid: false, error: "Invalid category." };
 
-  if (!validateFile(file))
-    return { valid: false, error: "Invalid file." };
+  return { valid: true };
+}
+
+export function validateRegistrationLimit(currentCount) {
+  if (currentCount >= MAX_REGISTRATIONS) {
+    return {
+      valid: false,
+      error: `Registration is full. Maximum ${MAX_REGISTRATIONS} registrations reached.`,
+    };
+  }
 
   return { valid: true };
 }
