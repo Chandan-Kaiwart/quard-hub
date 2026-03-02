@@ -6,12 +6,28 @@ const supabase = createClient(
     process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+// ─── Simple in-memory rate limiter ───────────────────────────────────────────
+// Resets on every Vercel cold start, but good enough for 40 entry limit
+const submissionCount = { count: 0 };
+const MAX_REGISTRATIONS = 22;
+
 export default async function handler(req, res) {
     if (req.method !== "POST") {
         return res.status(405).json({ error: "Method not allowed" });
     }
 
     try {
+        // Check total registrations in DB (persistent — survives cold starts)
+        const { count, error: countError } = await supabase
+            .from("registrations")
+            .select("*", { count: "exact", head: true });
+
+        if (countError) return res.status(500).json({ error: "Could not verify registration limit." });
+
+        if (count >= MAX_REGISTRATIONS) {
+            return res.status(429).json({ error: "Registration is full. Maximum 40 registrations reached." });
+        }
+
         const { first_name, last_name, email, phone, college, category, fileBase64, fileName } = req.body;
 
         if (!first_name || !last_name || !email || !phone || !college || !category || !fileBase64) {
