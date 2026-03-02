@@ -258,7 +258,7 @@ const RegistrationSection = () => {
 
               <div>
                 <label className="font-mono text-xs text-muted-foreground uppercase tracking-wider block mb-2">
-                  ID Proof (College/Any Government ID in JPG/PNG/PDF, max 5MB) *
+                  ID Proof (College/Any Government ID in JPG/PNG/PDF, max 4 MB) *
                 </label>
                 <input name="college_id" type="file" required accept=".jpg,.jpeg,.png,.pdf"
                   className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border file:border-primary/30 file:text-sm file:font-mono file:bg-primary/10 file:text-primary hover:file:bg-primary/20 file:transition-colors file:cursor-pointer" />
