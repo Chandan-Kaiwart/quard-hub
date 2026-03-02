@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { validateApiPayload, validateRegistrationLimit } from "../src/components/validation";
+import { validateApiPayload, validateRegistrationLimit } from "./validation.js";
 
 // ✅ service_role bypasses RLS — safe only on server side
 const supabase = createClient(
