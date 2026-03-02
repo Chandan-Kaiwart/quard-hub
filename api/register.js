@@ -5,7 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 // So DNS issues on mobile networks (Jio/BSNL) are completely bypassed.
 const supabase = createClient(
     process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY
+    process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 export default async function handler(req, res) {
