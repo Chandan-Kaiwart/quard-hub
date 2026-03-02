@@ -21,7 +21,7 @@ export const config = {
 const parseForm = (req) =>
     new Promise((resolve, reject) => {
         const form = formidable({
-            maxFileSize: 10 * 1024 * 1024, // 10MB
+            maxFileSize: 4 * 1024 * 1024, // 4MB
             allowEmptyFiles: false,
             filter: ({ mimetype }) =>
                 !!mimetype && ["image/jpeg", "image/png", "application/pdf"].includes(mimetype),
