@@ -33,5 +33,8 @@ export const validateFile = (file) =>
   file.size <= MAX_FILE_SIZE &&
   ALLOWED_FILE_TYPES.includes(file.type);
 
+export const validateTransactionId = (value) =>
+  /^[A-Za-z0-9_-]{5,50}$/.test(value);
+
 export const sanitize = (value) =>
   typeof value === "string" ? value.trim() : "";

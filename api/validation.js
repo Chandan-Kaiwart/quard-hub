@@ -39,9 +39,10 @@ export function validateApiPayload(fields) {
     college,
     category,
     id_proof_url,
+    transaction_id,
   } = fields;
 
-  if (!first_name || !last_name || !email || !phone || !college || !category || !id_proof_url) {
+  if (!first_name || !last_name || !email || !phone || !college || !category || !id_proof_url || !transaction_id) {
     return { valid: false, error: "All fields are required." };
   }
 

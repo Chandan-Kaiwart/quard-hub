@@ -11,6 +11,7 @@ import {
   validateCollege,
   validateCategory,
   validateFile,
+  validateTransactionId,
   MAX_FILE_SIZE,
   ALLOWED_FILE_TYPES,
 } from "./validation";
@@ -95,6 +96,7 @@ const RegistrationSection = () => {
       const phone = sanitize(formData.get("phone"));
       const college = sanitize(formData.get("college"));
       const category = sanitize(formData.get("category"));
+      const transactionId = sanitize(formData.get("transaction_id"));
       const file = formData.get("college_id") as File | null;
 
       if (!validateName(firstName))
@@ -115,6 +117,9 @@ const RegistrationSection = () => {
       if (!validateCategory(category))
         throw new Error("Please select a valid category.");
 
+      if (!validateTransactionId(transactionId))
+        throw new Error("Please enter a valid Transaction ID.");
+
       if (!validateFile(file))
         throw new Error("Invalid file. Only JPG, PNG, PDF under 4 MB allowed.");
 
@@ -125,6 +130,7 @@ const RegistrationSection = () => {
       payload.append("phone", phone);
       payload.append("college", college);
       payload.append("category", category);
+      payload.append("transaction_id", transactionId);
       payload.append("college_id", file!);
 
       await safeFetch("/api/register", {
@@ -216,6 +222,14 @@ const RegistrationSection = () => {
               </div>
 
               <div>
+                <label className="font-mono text-xs text-muted-foreground uppercase tracking-wider block mb-2">
+                  ID Proof (College/Any Government ID in JPG/PNG/PDF, max 4 MB) *
+                </label>
+                <input name="college_id" type="file" required accept=".jpg,.jpeg,.png,.pdf"
+                  className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border file:border-primary/30 file:text-sm file:font-mono file:bg-primary/10 file:text-primary hover:file:bg-primary/20 file:transition-colors file:cursor-pointer" />
+              </div>
+
+              <div>
                 <label className="font-mono text-xs text-muted-foreground uppercase tracking-wider block mb-2">Category *</label>
                 <select name="category" required value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
@@ -256,13 +270,14 @@ const RegistrationSection = () => {
                 </motion.div>
               )}
 
-              <div>
-                <label className="font-mono text-xs text-muted-foreground uppercase tracking-wider block mb-2">
-                  ID Proof (College/Any Government ID in JPG/PNG/PDF, max 4 MB) *
-                </label>
-                <input name="college_id" type="file" required accept=".jpg,.jpeg,.png,.pdf"
-                  className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border file:border-primary/30 file:text-sm file:font-mono file:bg-primary/10 file:text-primary hover:file:bg-primary/20 file:transition-colors file:cursor-pointer" />
-              </div>
+              {selectedCategory && (
+                <div>
+                  <label className="font-mono text-xs text-muted-foreground uppercase tracking-wider block mb-2">Transaction ID *</label>
+                  <input name="transaction_id" required placeholder="Enter UPI Transaction ID"
+                    className="w-full px-4 py-3 bg-muted/30 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors" />
+                </div>
+              )}
+
 
               {/* Registration Details */}
               <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-2">
