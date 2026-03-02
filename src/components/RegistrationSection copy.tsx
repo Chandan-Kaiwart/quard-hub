@@ -3,7 +3,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
 import { Send, Loader2, CheckCircle, AlertCircle } from "lucide-react";
-import { supabase } from "src/supabaseClient"; // adjust path as needed
+import { supabase } from "../supabaseClient"; // adjust path as needed
 
 const categories = [
   { value: "UG_STUDENT/PG_Student", label: "UG Student / PG Student", amount: 500 },
@@ -91,7 +91,7 @@ const RegistrationSection = () => {
       if (!validateCategory(category))
         throw new Error("Please select a valid category.");
       if (!validateFile(file))
-        throw new Error("Invalid file. Only JPG, PNG, or PDF under 5MB allowed.");
+        throw new Error("Invalid file. Only JPG, PNG, or PDF under 10 MB allowed.");
 
       // Step 1: Upload ID proof to Supabase Storage
       const ext = file!.name.split(".").pop();
@@ -280,7 +280,7 @@ const RegistrationSection = () => {
 
               <div>
                 <label className="font-mono text-xs text-muted-foreground uppercase tracking-wider block mb-2">
-                  ID Proof (College/Any Government ID in JPG/PNG/PDF, max 5MB) *
+                  ID Proof (College/Any Government ID in JPG/PNG/PDF, max 10 MB) *
                 </label>
                 <input
                   name="college_id"

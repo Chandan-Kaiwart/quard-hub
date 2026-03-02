@@ -11,7 +11,7 @@ const Footer = () => {
           </div>
 
           <p className="font-mono text-xs text-muted-foreground text-center">
-            © 2026 QUARD² — National Forensics Science University, Chennai Campus
+            © 2026 QUARD² — National Forensic Sciences University, Chennai Campus
           </p>
 
           <div className="flex items-center gap-6">

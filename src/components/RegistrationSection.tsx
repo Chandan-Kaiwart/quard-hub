@@ -65,7 +65,7 @@ const RegistrationSection = () => {
       if (!validatePhone(phone)) throw new Error("Please enter a valid phone number.");
       if (!validateCollege(college)) throw new Error("Please enter a valid college/organization name.");
       if (!validateCategory(category)) throw new Error("Please select a valid category.");
-      if (!validateFile(file)) throw new Error("Invalid file. Only JPG, PNG, or PDF under 5MB allowed.");
+      if (!validateFile(file)) throw new Error("Invalid file. Only JPG, PNG, or PDF under 10 MB allowed.");
 
       // Step 1: Upload ID proof to Supabase Storage
       const ext = file!.name.split(".").pop();
@@ -208,11 +208,24 @@ const RegistrationSection = () => {
 
               <div>
                 <label className="font-mono text-xs text-muted-foreground uppercase tracking-wider block mb-2">
-                  ID Proof (College/Any Government ID in JPG/PNG/PDF, max 5MB) *
+                  ID Proof (College/Any Government ID in JPG/PNG/PDF, max 10 MB) *
                 </label>
                 <input name="college_id" type="file" required accept=".jpg,.jpeg,.png,.pdf"
                   className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border file:border-primary/30 file:text-sm file:font-mono file:bg-primary/10 file:text-primary hover:file:bg-primary/20 file:transition-colors file:cursor-pointer" />
               </div>
+              {/* Registration Details */}
+              <div className="pt-4 border-t border-border space-y-2">
+                <h4 className="font-heading text-sm font-semibold text-primary uppercase tracking-wider">
+                  Registration Details
+                </h4>
+
+                <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                  <li>Registration fee varies by course.</li>
+                  <li>After registration, a confirmation email will be sent along with payment details.</li>
+                  <li>After verification, registration will be confirmed.</li>
+                </ul>
+              </div>
+
 
               <button type="submit" disabled={status === "loading"}
                 className="clip-btn w-full px-10 py-4 bg-primary text-primary-foreground font-heading font-bold text-sm uppercase tracking-widest hover:shadow-[var(--shadow-gold)] transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-3"
