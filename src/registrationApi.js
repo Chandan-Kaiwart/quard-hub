@@ -1,5 +1,5 @@
 import { supabase } from "./supabaseClient";
-import { validateUploadFile, validateStoragePath, sanitize } from ".components/validation.ts";
+import { validateUploadFile, validateStoragePath, sanitize } from "./components/validation";
 
 // ─── Submit Registration ──────────────────────────────────────────────────────
 export async function submitRegistration({

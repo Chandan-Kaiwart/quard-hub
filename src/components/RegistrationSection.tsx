@@ -13,7 +13,7 @@ import {
   validateFile,
   MAX_FILE_SIZE,
   ALLOWED_FILE_TYPES,
-} from "./validation.ts";
+} from "./validation.js";
 import qr1000 from "../payment/QUARD UPI 1000.png";
 import qr1500 from "../payment/QUARD UPI 1500.jpeg";
 import qr2000 from "../payment/QUARD UPI 2000.jpeg";
