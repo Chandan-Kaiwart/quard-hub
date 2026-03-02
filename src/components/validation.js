@@ -1,74 +1,67 @@
-// ─── Server-side Validation (Vercel Safe) ─────────────────────────
+// ─── Constants ─────────────────────────────
 
-const MAX_REGISTRATIONS = 30;
+export const MAX_FILE_SIZE = 5 * 1024 * 1024;
+export const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "application/pdf"];
 
-const VALID_CATEGORIES = [
+export const VALID_CATEGORIES = [
   "UG_STUDENT/PG_Student",
   "PhD/RESEARCH_SCHOLAR",
   "FACULTY/Academicians",
 ];
 
-const validateName = (value) =>
+// ─── Validators ───────────────────────────
+
+export const validateName = (value) =>
   /^[A-Za-z\s'-]{2,40}$/.test(value);
 
-const validateEmail = (value) =>
+export const validateEmail = (value) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-const validatePhone = (value) =>
+export const validatePhone = (value) =>
   /^[+]?[\d\s-]{10}$/.test(value);
 
-const validateCollege = (value) =>
-  value.length >= 3 && value.length <= 120;
+export const validateCollege = (value) =>
+  value && value.length >= 3 && value.length <= 120;
 
-const validateCategory = (value) =>
+export const validateCategory = (value) =>
   VALID_CATEGORIES.includes(value);
 
-const sanitize = (value) =>
+export const validateFile = (file) =>
+  file &&
+  file.size > 0 &&
+  file.size <= MAX_FILE_SIZE &&
+  ALLOWED_FILE_TYPES.includes(file.type);
+
+// ─── Sanitizer ───────────────────────────
+
+export const sanitize = (value) =>
   typeof value === "string" ? value.trim() : "";
 
-export function validateApiPayload(fields) {
-  const {
-    first_name,
-    last_name,
-    email,
-    phone,
-    college,
-    category,
-    id_proof_url,
-  } = fields;
+// ─── Form Validation ─────────────────────
 
-  if (!first_name || !last_name || !email || !phone || !college || !category || !id_proof_url) {
-    return { valid: false, error: "All fields are required." };
-  }
+export function validateRegistrationForm(fields) {
+  const { firstName, lastName, email, phone, college, category, file } = fields;
 
-  if (!validateName(sanitize(first_name)))
+  if (!validateName(firstName))
     return { valid: false, error: "Invalid first name." };
 
-  if (!validateName(sanitize(last_name)))
+  if (!validateName(lastName))
     return { valid: false, error: "Invalid last name." };
 
-  if (!validateEmail(sanitize(String(email)).toLowerCase()))
-    return { valid: false, error: "Invalid email address." };
+  if (!validateEmail(email))
+    return { valid: false, error: "Invalid email." };
 
-  if (!validatePhone(sanitize(phone)))
+  if (!validatePhone(phone))
     return { valid: false, error: "Invalid phone number." };
 
-  if (!validateCollege(sanitize(college)))
-    return { valid: false, error: "Invalid college/organization." };
+  if (!validateCollege(college))
+    return { valid: false, error: "Invalid college." };
 
-  if (!validateCategory(sanitize(category)))
+  if (!validateCategory(category))
     return { valid: false, error: "Invalid category." };
 
-  return { valid: true };
-}
-
-export function validateRegistrationLimit(currentCount) {
-  if (currentCount >= MAX_REGISTRATIONS) {
-    return {
-      valid: false,
-      error: `Registration is full. Maximum ${MAX_REGISTRATIONS} registrations reached.`,
-    };
-  }
+  if (!validateFile(file))
+    return { valid: false, error: "Invalid file." };
 
   return { valid: true };
 }
