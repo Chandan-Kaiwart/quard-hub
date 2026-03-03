@@ -212,7 +212,7 @@ const RegistrationSection = () => {
                 Registration Received!
               </h3>
               <p className="text-muted-foreground">
-                Check your email for confirmation. We'll review your registration and get back to you soon.
+                Thank you for registering! You will get confirmation email within 24-48 hours after verification of your details.
               </p>
             </div>
           ) : (

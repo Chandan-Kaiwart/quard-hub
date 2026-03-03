@@ -80,8 +80,8 @@ const ContactSection = () => {
                   <span className="font-heading text-sm font-bold text-primary">For Queries</span>
                 </div>
                 <div className="space-y-1 pl-6">
-                  <p className="text-foreground/80 text-sm">Moksh Grover — +91-98717 12217</p>
-                  <p className="text-foreground/80 text-sm">Herrin Shah — +91-93287 43418</p>
+                  <p className="text-foreground/80 text-sm">+91-98717 12217</p>
+                  <p className="text-foreground/80 text-sm">+91-93287 43418</p>
                 </div>
               </div>
 
@@ -91,7 +91,8 @@ const ContactSection = () => {
                   <span className="font-heading text-sm font-bold text-primary">Registration Support</span>
                 </div>
                 <div className="pl-6">
-                  <p className="text-foreground/80 text-sm">Sai Charan — +91-80105 70034</p>
+                  <p className="text-foreground/80 text-sm">+91-80105 70034</p>
+                  <p className="text-foreground/80 text-sm">+91-98958 39952</p>
                 </div>
               </div>
             </div>
