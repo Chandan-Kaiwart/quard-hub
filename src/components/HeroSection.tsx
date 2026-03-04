@@ -62,7 +62,7 @@ const HeroSection = () => {
           className="text-5xl md:text-8xl font-heading font-extrabold mb-4 tracking-tight"
         >
           <span className="text-gradient-gold">QTF - 2026</span>
-          <sup className="text-primary text-3xl md:text-5xl">²</sup>
+          
         </motion.h1>
 
         <motion.p
