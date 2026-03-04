@@ -28,8 +28,15 @@ const Navbar = () => {
       }`}
     >
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-        <a href="#" className="font-heading text-xl font-extrabold text-primary tracking-wider">
-          QUARD²
+        <a href="#" className="flex items-center gap-3">
+          <img
+            src="/public/favicon.ico"
+            alt="Workshop Logo"
+            className="h-20 w-auto object-contain"
+          />
+          {/* <span className="font-heading text-xl font-extrabold text-primary tracking-wider">
+            QTF - 2026
+          </span> */}
         </a>
 
         {/* Desktop nav */}
