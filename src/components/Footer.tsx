@@ -7,11 +7,11 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
             <Shield className="w-6 h-6 text-primary" />
-            <span className="font-heading text-lg font-extrabold text-primary">QUARD²</span>
+            <span className="font-heading text-lg font-extrabold text-primary">QTF</span>
           </div>
 
           <p className="font-mono text-xs text-muted-foreground text-center">
-            © 2026 QUARD² — National Forensic Sciences University, Chennai Campus
+            © 2026 QTF — National Forensic Sciences University, Chennai Campus
           </p>
 
           <div className="flex items-center gap-6">
