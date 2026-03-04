@@ -61,7 +61,7 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-5xl md:text-8xl font-heading font-extrabold mb-4 tracking-tight"
         >
-          <span className="text-gradient-gold">QUARD</span>
+          <span className="text-gradient-gold">QTF - 2026</span>
           <sup className="text-primary text-3xl md:text-5xl">²</sup>
         </motion.h1>
 
@@ -71,7 +71,7 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="font-mono text-xs md:text-sm text-muted-foreground tracking-[0.2em] uppercase mb-8"
         >
-          Quantum Understanding & Analysis with Real-world Data Driven
+          Quantum Technologies: A Roadmap for Future
         </motion.p>
 
         <motion.div
@@ -115,9 +115,9 @@ const HeroSection = () => {
           className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4"
         >
           {[
-            { value: "8", label: "Tracks" },
+            { value: "7", label: "Tracks" },
             { value: "2", label: "Days" },
-            { value: "9", label: "Speakers" },
+            { value: "8", label: "Speakers" },
             { value: seatsLeft !== null ? seatsLeft.toString() : "...", label: "Seats Left" },
           ].map((stat) => (
             <div key={stat.label} className="stat-card rounded-lg px-6 py-4 text-center">
