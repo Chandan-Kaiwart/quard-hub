@@ -237,7 +237,7 @@ const RegistrationSection = () => {
               <div className="grid sm:grid-cols-2 gap-6">
                 <div>
                   <label className="font-mono text-xs text-muted-foreground uppercase tracking-wider block mb-2">Email *</label>
-                  <input name="email" type="email" required placeholder=" EMAIL ADDRESS"
+                  <input name="email" type="email" required placeholder="Email Address"
                     className="w-full px-4 py-3 bg-muted/30 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors" />
                 </div>
                 <div>
