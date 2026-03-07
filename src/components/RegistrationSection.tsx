@@ -35,9 +35,9 @@ const QR_IMAGES: Record<string, string> = {
 const terminalLines = [
   {
     cmd: "sessions_count:",
-    val: "9",
+    val: "8",
     color: "text-primary",
-    hint: "A quiz held after each of the 9 sessions — every answer counts",
+    hint: "A quiz held after each of the 8 sessions — every answer counts",
   },
   {
     cmd: "prize:",
@@ -64,6 +64,8 @@ const terminalLines = [
     hint: "Register now to secure your spot and your chance to win",
   },
 ];
+
+const MAX_SEATS = 30;
 
 const RegistrationSection = () => {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -108,9 +110,8 @@ const RegistrationSection = () => {
   const registrationAmount =
     categories.find((c) => c.value === selectedCategory)?.amount ?? null;
 
-  const MAX_SEATS = 22;
-  const filled = MAX_SEATS - (seatsLeft ?? MAX_SEATS);
-  const pct = Math.round((filled / MAX_SEATS) * 100);
+  // pct = how full the bar is (seats taken / total), animates from 0→filled
+  const pct = seatsLeft === null ? 0 : Math.round(((MAX_SEATS - seatsLeft) / MAX_SEATS) * 100);
 
   const safeFetch = async (url: string, options: RequestInit) => {
     const controller = new AbortController();
@@ -260,16 +261,13 @@ const RegistrationSection = () => {
                 </span>
               )}
             </div>
-            {/* Progress bar */}
+            {/* Progress bar — fills left→right as seats are taken */}
             <div className="w-full h-1.5 bg-muted/40 rounded-full overflow-hidden">
               <div
                 className="h-full bg-primary rounded-full transition-all duration-1000"
-                style={{ width: seatsLeft === null ? "0%" : `${pct}%` }}
+                style={{ width: `${pct}%` }}
               />
             </div>
-            {seatsLeft !== null && (
-              <p className="font-mono text-[10px] text-muted-foreground/50 mt-2 tracking-wider"></p>
-            )}
           </motion.div>
 
           {/* ── Quiz Challenge Terminal Banner ── */}
@@ -363,7 +361,7 @@ const RegistrationSection = () => {
                 </h3>
                 <p className="text-muted-foreground whitespace-pre-line">
                   We have reached our maximum capacity for this workshop.
-                  {""}Thank you for your overwhelming interest!
+                  {"\n"}Thank you for your overwhelming interest!
                 </p>
                 <div className="mt-8">
                   <a href="#about" className="text-primary hover:underline font-mono text-sm">
